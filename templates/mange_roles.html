@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+<br>
+<ul>
+{% for u in users %}
+	{% if u.role != "User" and u.email != "iorsengeb@gmail.com" %}
+		<li><a href="{{ url_for('assign_role', username=u.username) }}">{{ u.username }}</a><span class="badge">{{ u.role }}</span>
+	{% endif %}
+{% endfor %}
+</ul>
+
+<div class="page-header">
+	<h5>Search User</h5>
+</div>
+<div class="col-md-3">
+	<form method="GER">
+		<input type="text" name="text">
+		<input type="submit">
+	</form>
+</div>
+
+<ul id="results">
+	{% for user in users %}
+		{% if user.role != "Admin" %}
+			<li><a href="{{ url_for('assign_role', username=user.username) }}">{{ user.username }}</a><span class="badge">{{ user.role }}</span></li>
+		{% endif %}
+	{% endfor %}
+</ul>
+
+<script>
+	
+	document.querySelector("form").addEventListener("submit", async(e) => {
+	e.preventDefault();
+	const query = document.querySelector("input[name='text']").value;
+	const response = await fetch(`/username_search?srch=${query}`);
+	const results = await response.json();
+	 const resultsList = document.getElementById("results");
+	 resultsList.innerHTML = results.map(item => `
+	 	<li>
+	 	<a href="${item.url}">${item.username}</a>
+	 	<span class="badge">${item.role}</span>
+	 	</li>
+	 `);
+	});
+	
+</script>
+
+{% endblock %}

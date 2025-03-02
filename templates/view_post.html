@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div id="post">
+</div>
+{% if current_user.is_author(post) %}
+		<a href="" id="del">Delete post</a>
+{% endif %}
+<ul id="comments">
+
+</ul>
+
+<div class="col-md-4">
+{{ wtf.quick_form(form) }}
+</div>
+
+<script>
+	async function fetchPost(){
+		const response = await fetch(`/post/{{post.id}}`);
+		if(!response.ok){
+			throw new Error("Error");
+		}
+		const post = await response.json();
+		displayPost(post);
+	}
+	
+	function displayPost(post){
+		const postList = document.getElementById("post");
+		postList.innerHTML = `
+			<a href="${post.author_url}">${post.author}</a>
+			<h3 class="">${post.title}</h3>
+			<p>${post.body_html}</p>
+		`;
+		displayComments(post.comments);
+	}
+	
+	function displayComments(comm){
+		const commE = document.getElementById("comments");
+		comm.forEach(c =>{
+			const listItem = document.createElement("li");
+			listItem.innerHTML = `
+				<a href="${c.author_url}">${c.author}</a>
+				<p>${c.text}</p>
+				<a href="">View replies</a>
+			`
+			commE.appendChild(listItem);
+		});
+	}
+	fetchPost()
+	
+</script>
+
+{% endblock %}

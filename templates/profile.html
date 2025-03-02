@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block content %}
+	
+	<div class="page-header">
+		<h3 class="text-center" id="username"></h3>
+		<p class="badge text-center" id="role"></p>
+	</div>
+	
+	<div id="details">
+		
+	</div>
+	
+	<ul id="posts">
+		
+	</ul>
+	
+	<script>
+		
+		async function fetchUser(){
+			try{
+			url = `/user/{{ user.username }}`;
+				const response = await fetch(url);
+				if(!response.ok){
+					throw new Error("Error");
+				}
+				const use = await response.json();
+				displayUserData(use);
+				displayPosts(use.posts);
+			}catch(error){
+				console.log("Error");
+			}
+		}
+		
+		function displayUserData(use){
+			const u = document.getElementById("username");
+			u.innerHTML = use.username;
+			document.getElementById("role").innerHTML = use.role;
+			details = document.getElementById("details");
+			details.innerHTML = `<p class="text-center">${use.email}</p>`;
+		}
+		function displayPosts(post){
+			const p = document.getElementById("posts");
+			post.forEach(po => {
+					const listItem = document.createElement("li");
+					listItem.innerHTML = `
+						<a href="${po.author_url}">${po.author}</a>
+						<p class="badge">${po.timestamp}</p>
+						<h3>${po.title}</h3>
+						<p>${po.body_html}</p>
+						<a href="${po.post_url}">comments (${po.comments_count})</a>
+						<a href="${po.post_url}">View post</a>
+					`
+					p.appendChild(listItem);
+			});
+		}
+		fetchUser();
+	</script>
+
+{% endblock %}

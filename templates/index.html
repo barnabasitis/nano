@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% if current_user.is_authenticated %}
+<br>
+<div class="col-md-4">
+	<a class="btn btn-primary btn-xs" href="{{ url_for('create_post') }}">Create Post</a>
+{% if current_user.role == "Admin" %}
+	<a class="btn btn-default btn-sm" href="{{ url_for('manage_roles') }}">Manage Roles</a>
+{% endif %}
+</div>
+
+{% endif %}
+
+<div class="col-md-4" id="d">
+	<ul id="posts">
+	
+	</ul>
+</div>
+
+<script>
+	
+	async function fetchPosts(){
+		const response = await fetch(`/posts`);
+		if(!response.ok){
+			throw new Error("Error");
+		}
+		const posts = await response.json();
+		displayPosts(posts);
+	}
+	
+	function displayPosts(posts){
+		const postList = document.getElementById("posts");
+		posts.forEach(post => {
+			const listItem = document.createElement("li");
+			listItem.innerHTML = `
+				<a href="${post.author_url}">${post.author}</a>
+					<p class="badge">${post.timestamp}</p>
+						<h3>${post.title}</h3>
+						<p>${post.body_html}</p>
+						<a href="${post.self_url}">comments (${post.comments_count})</a>
+						<a href="${post.self_url}">View post</a>
+			`
+			postList.appendChild(listItem);
+		});
+	}
+	fetchPosts();
+	
+</script>
+
+{% endblock %}
